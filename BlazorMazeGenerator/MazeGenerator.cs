@@ -42,7 +42,6 @@ namespace BlazorMazeGenerator.MazeGen{
             {
                 for (int j = 0; j < GridWidth; j++)
                 {
-                    this.EdgeList.Add(new int[] { });
                     if (j + 1 < GridWidth)
                     {
                         this.edges[k,0] = grid[i,j];
@@ -74,10 +73,16 @@ namespace BlazorMazeGenerator.MazeGen{
                 this.edges[i,3] = rand.Next(min, max);
             }
 
+            for (int i = 0; i < edges.GetLength(0); i++)
+            {
+                this.EdgeList.Add(new int[] { edges[i, 0], edges[i, 1], edges[i, 2], edges[i, 3] });
+            }
+
         }
 
         public List<int[]> Kruskals()
         {
+            Console.WriteLine("Performing Kruskal's algorithm");
 
             EdgeList.Sort((a,b) => a[3] - b[3]);
 
