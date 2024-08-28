@@ -1,0 +1,81 @@
+﻿@page "/mazegenerator"
+
+@* @inject MazeGenerator MST*@
+
+@using BlazorMazeGenerator.MazeGen
+
+<h3>Maze Generator Test</h3>
+
+<p>
+    <button @onclick="GenerateMaze">Generate Maze</button>
+</p>
+
+@if (mst != null && mst.Count > 0)
+{
+    <h4>Minimum Spanning Tree (MST):</h4>
+    <ul>
+        @foreach (var edge in mst)
+        {
+            <li>Edge: @edge[0] - @edge[1], Type: @edge[2], Weight: @edge[3]</li>
+        }
+    </ul>
+}
+else if (mst == null)
+{
+    <p>No maze generated yet.</p>
+}
+else
+{
+    <p>Maze generation failed or produced an empty MST.</p>
+}
+
+@code {
+
+    private List<int[]>? mst;
+
+    private void GenerateMaze()
+    {
+        var generator = new MazeGen.MazeGenerator(75, 75, 25);
+        mst = generator.Kruskals();
+
+        // Force UI to refresh (optional)
+        StateHasChanged();
+    }
+}
+
+
+
+@*
+ <div class="maze-container">
+     @for (int row = 0; row < mazeHeight; row++)
+     {
+         <div class="maze-row">
+             @for (int col = 0; col < mazeWidth; col++)
+             {
+                 <div class="node"></div>
+
+                 @if (col < mazeWidth - 1 && verticalWalls[row, col])
+                 {
+                     <div class="vertical-wall"></div>
+                 }
+             }
+         </div>
+         @if (row < mazeHeight - 1)
+         {
+             <div class="maze-row">
+                 @for (int col = 0; col < mazeWidth; col++)
+                 {
+                     @if (horizontalWalls[row, col])
+                     {
+                         <div class="horizontal-wall"></div>
+                     }
+                     else
+                     {
+                         <div class="space"></div>
+                     }
+                 }
+             </div>
+         }
+     }
+ </div>
+ *@

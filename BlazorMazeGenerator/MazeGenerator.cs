@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 //using System.Random;
-namespace BlazorMazeGenerator.MazeGenerator{
+namespace BlazorMazeGenerator.MazeGen{
 
     public class MazeGenerator
     {
@@ -17,13 +17,15 @@ namespace BlazorMazeGenerator.MazeGenerator{
 
         public MazeGenerator(int WindowHeight, int WindowWidth, int UnitSize)
         {
-            this.grid = new int[GridHeight, GridWidth];
-            this.edges = new int[2 * GridHeight * (GridWidth - 1), 4];
+            
             this.WindowWidth = WindowWidth;
             this.WindowHeight = WindowHeight;
             this.UnitSize = UnitSize;
             this.GridWidth = WindowWidth / UnitSize;
             this.GridHeight = WindowHeight / UnitSize;
+
+            this.grid = new int[GridHeight, GridWidth];
+            this.edges = new int[2 * GridHeight * (GridWidth - 1), 4];
             this.EdgeList = new List<int[]>();
             this.MST = new List<int[]>();
 
@@ -74,7 +76,7 @@ namespace BlazorMazeGenerator.MazeGenerator{
 
         }
 
-        public void Kruskals()
+        public List<int[]> Kruskals()
         {
 
             EdgeList.Sort((a,b) => a[3] - b[3]);
@@ -108,6 +110,8 @@ namespace BlazorMazeGenerator.MazeGenerator{
                     Forest.Union(InitialNode, TerminalNode);
                 }
             }
+
+            return MST;
         }
 
         public void NodesToString()
