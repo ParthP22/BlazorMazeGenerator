@@ -31,9 +31,93 @@ else
     <p>Maze generation failed or produced an empty MST.</p>
 }*@
 
+@*
+<div class="maze-container">
+    @for (int row = 0; row < mazeHeight; row++)
+    {
+        <div class="maze-row">
+            @for (int col = 0; col < mazeWidth; col++)
+            {
+                <div class="node"></div>
+
+                @if (col < mazeWidth - 1 && verticalWalls[row, col])
+                {
+                    <div class="vertical-wall"></div>
+                }
+            }
+        </div>
+        @if (row < mazeHeight - 1)
+        {
+            <div class="maze-row">
+                @for (int col = 0; col < mazeWidth; col++)
+                {
+                    @if (horizontalWalls[row, col])
+                    {
+                        <div class="horizontal-wall"></div>
+                    }
+                    else
+                    {
+                        <div class="space"></div>
+                    }
+                }
+            </div>
+        }
+    }
+</div>
+*@
+@*
+@if(grid != null){
+    <div class="maze-container">
+        @for (int row = 0; row < GridHeight; row++)
+        {
+            <div class="maze-row">
+                @for (int col = 0; col < GridWidth; col++)
+                {
+                    <div class="node"></div>
+
+                    @if (edges[grid[row, col],2] == 1)
+                {
+                        <div class="vertical-wall"></div>
+                    }
+                }
+            </div>
+            @if (row < GridHeight - 1)
+            {
+                <div class="maze-row">
+                    @for (int col = 0; col < GridWidth; col++)
+                    {
+                        @if (edges[grid[row, col], 2] == 0)
+                        {
+                            <div class="horizontal-wall"></div>
+                        }
+                        else
+                        {
+                            <div class="space"></div>
+                        }
+                    }
+                </div>
+            }
+        }
+    </div>
+}
+*@
+@*
+else
+{
+    <p>No grid yet</p>
+}
+*@
+
+@*
 @code {
 
     private List<int[]>? mst;
+    private List<int[]>? walls;
+    private int[,]? edges;
+    private int[,]? grid;
+    private int GridHeight = 3;
+    private int GridWidth = 3;
+
 
     private void GenerateMaze()
     {
@@ -45,44 +129,101 @@ else
             Console.WriteLine(edge[0] + ", " + edge[1]); 
         }
 
+        walls = generator.WallEdges;
+        grid = generator.grid;
+
+        edges = generator.edges;
+
+
         // Force UI to refresh (optional)
         StateHasChanged();
     }
+}*@
+
+<h3>Maze Generator Test (SVG Version)</h3>
+
+<p>
+    <button @onclick="GenerateMaze">Generate Maze</button>
+</p>
+
+@if (mst != null)
+{
+    <svg width="@(GridWidth * UnitSize)" height="@(GridHeight * UnitSize)" style="border:1px solid black;">
+        @for(int i = 0; i < walls.Count; i++)
+        {
+            @if (walls[i][2] == 0) // Vertical edge
+            {
+                if (walls[i][4] == 1)
+                {
+                    <line x1="@GetX(walls[i][0])" y1="@GetY(walls[i][0])" x2="@GetX(walls[i][0])" y2="@GetY(walls[i][0]) + @UnitSize" stroke="black" stroke-width="2" />
+                }
+                else
+                {
+                    <line x1="@GetX(walls[i][0])" y1="@GetY(walls[i][0])" x2="@GetX(walls[i][0])" y2="@GetY(walls[i][0]) + @UnitSize" stroke="white" stroke-width="2" />
+                }
+
+            }
+            else if (walls[i][2] == 1) // Horizontal edge
+            {
+                if (walls[i][4] == 1)
+                {
+                    <line x1="@GetX(walls[i][0])" y1="@GetY(walls[i][0])" x2="@GetX(walls[i][0]) + @UnitSize" y2="@GetY(walls[i][0])" stroke="black" stroke-width="2" />
+                }
+                else
+                {
+                    <line x1="@GetX(walls[i][0])" y1="@GetY(walls[i][0])" x2="@GetX(walls[i][0]) + @UnitSize" y2="@GetY(walls[i][0])" stroke="white" stroke-width="2" />
+                }
+                
+            }
+            
+        }
+    </svg>
+}
+else
+{
+    <p>No maze generated yet.</p>
+}
+
+@code {
+    private List<int[]>? mst;
+    private List<int[]>? walls;
+    private int[,]? edges;
+    private int[,]? grid;
+    private int WindowHeight = 75;
+    private int WindowWidth = 75;
+    private int UnitSize = 25;
+    private int GridHeight => WindowHeight / UnitSize;
+    private int GridWidth => WindowWidth / UnitSize;
+
+
+
+    private int GetX(int node) => (node % GridWidth) * UnitSize + UnitSize;
+    private int GetY(int node) => (node / GridWidth) * UnitSize + UnitSize;
+
+    private void GenerateMaze()
+    {
+        Console.WriteLine("Generating Maze...");
+        var generator = new MazeGen.MazeGenerator(WindowHeight, WindowWidth, UnitSize);
+        mst = generator.Kruskals();
+        foreach (int[] edge in mst)
+        {
+            Console.WriteLine(edge[0] + ", " + edge[1]);
+        }
+
+        walls = generator.WallEdges;
+        grid = generator.grid;
+
+        edges = generator.edges;
+
+
+        // Force UI to refresh (optional)
+        StateHasChanged();
+    }
+
 }
 
 
 
-@*
- <div class="maze-container">
-     @for (int row = 0; row < mazeHeight; row++)
-     {
-         <div class="maze-row">
-             @for (int col = 0; col < mazeWidth; col++)
-             {
-                 <div class="node"></div>
 
-                 @if (col < mazeWidth - 1 && verticalWalls[row, col])
-                 {
-                     <div class="vertical-wall"></div>
-                 }
-             }
-         </div>
-         @if (row < mazeHeight - 1)
-         {
-             <div class="maze-row">
-                 @for (int col = 0; col < mazeWidth; col++)
-                 {
-                     @if (horizontalWalls[row, col])
-                     {
-                         <div class="horizontal-wall"></div>
-                     }
-                     else
-                     {
-                         <div class="space"></div>
-                     }
-                 }
-             </div>
-         }
-     }
- </div>
- *@
+
+ 

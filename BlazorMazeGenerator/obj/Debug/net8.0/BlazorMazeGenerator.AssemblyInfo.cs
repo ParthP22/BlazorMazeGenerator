@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BlazorMazeGenerator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+684dce84a9c57a035aa62b15230cada711bf795b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8c035a727b6dab23ce371008355f0789b69b740d")]
 [assembly: System.Reflection.AssemblyProductAttribute("BlazorMazeGenerator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BlazorMazeGenerator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

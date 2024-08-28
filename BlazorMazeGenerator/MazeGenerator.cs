@@ -5,10 +5,11 @@ namespace BlazorMazeGenerator.MazeGen{
 
     public class MazeGenerator
     {
-        private int[,] grid;
-        private int[,] edges;
-        private List<int[]> EdgeList;
-        private List<int[]> MST;
+        private int[,] _grid;
+        private int[,] _edges;
+        private List<int[]> _EdgeList;
+        private List<int[]> _WallEdges;
+        private List<int[]> _MST;
         private int WindowHeight;
         private int WindowWidth;
         private int GridHeight;
@@ -24,16 +25,17 @@ namespace BlazorMazeGenerator.MazeGen{
             this.GridWidth = WindowWidth / UnitSize;
             this.GridHeight = WindowHeight / UnitSize;
 
-            this.grid = new int[GridHeight, GridWidth];
-            this.edges = new int[2 * GridHeight * (GridWidth - 1), 4];
-            this.EdgeList = new List<int[]>();
-            this.MST = new List<int[]>();
+            this._grid = new int[GridHeight, GridWidth];
+            this._edges = new int[2 * GridHeight * (GridWidth - 1), 5];
+            this._EdgeList = new List<int[]>();
+            this._MST = new List<int[]>();
+            this._WallEdges = new List<int[]>();
 
             for (int i = 0, k = 0; i < GridHeight; i++)
             {
                 for (int j = 0; j < GridWidth; j++)
                 {
-                    grid[i,j] = k;
+                    _grid[i,j] = k;
                     k++;
                 }
             }
@@ -44,20 +46,21 @@ namespace BlazorMazeGenerator.MazeGen{
                 {
                     if (j + 1 < GridWidth)
                     {
-                        this.edges[k,0] = grid[i,j];
-                        this.edges[k,1] = grid[i,j + 1];
-                        this.edges[k,2] = 0;
+                        this._edges[k,0] = _grid[i,j];
+                        this._edges[k,1] = _grid[i,j + 1];
+                        this._edges[k,2] = 0;
                         k++;
                     
                     }
                     if (i + 1 < GridHeight)
                     {
-                        this.edges[k,0] = grid[i,j];
-                        this.edges[k,1] = grid[i + 1,j];
-                        this.edges[k,2] = 1;
+                        this._edges[k,0] = _grid[i,j];
+                        this._edges[k,1] = _grid[i + 1,j];
+                        this._edges[k,2] = 1;
                         k++;
                     
                     }
+                    
                 }
             }
 
@@ -68,14 +71,16 @@ namespace BlazorMazeGenerator.MazeGen{
             int max = Int32.MaxValue;
 
 
-            for (int i = 0; i < edges.GetLength(0); i++)
+            for (int i = 0; i < _edges.GetLength(0); i++)
             {
-                this.edges[i,3] = rand.Next(min, max);
+                this._edges[i,3] = rand.Next(min, max);
+                this._edges[i,4] = 1;
             }
 
-            for (int i = 0; i < edges.GetLength(0); i++)
+            for (int i = 0; i < _edges.GetLength(0); i++)
             {
-                this.EdgeList.Add(new int[] { edges[i, 0], edges[i, 1], edges[i, 2], edges[i, 3] });
+                this._EdgeList.Add(new int[] { _edges[i, 0], _edges[i, 1], _edges[i, 2], _edges[i, 3], _edges[i,4] });
+                this._WallEdges.Add(new int[] { _edges[i, 0], _edges[i, 1], _edges[i, 2], _edges[i, 3], _edges[i,4] });
             }
 
         }
@@ -84,14 +89,14 @@ namespace BlazorMazeGenerator.MazeGen{
         {
             Console.WriteLine("Performing Kruskal's algorithm");
 
-            EdgeList.Sort((a,b) => a[3] - b[3]);
+            _WallEdges.Sort((a,b) => a[3] - b[3]);
 
 
 
             // edgelist_to_string(edge_list);
 
             DisjointSet Forest = new DisjointSet(GridHeight * GridWidth);
-            int size = this.EdgeList.Count;
+            int size = this._WallEdges.Count;
             // printf("Print: %d", size);
 
            
@@ -100,7 +105,7 @@ namespace BlazorMazeGenerator.MazeGen{
 
             for (int i = 0; i < size; i++)
             {
-                int[] node = EdgeList[i];
+                int[] node = _WallEdges[i];
             
                 //printf("\nIndex: %d", i);
                 int InitialNode = Forest.FindRepresentative(node[0]);
@@ -108,16 +113,63 @@ namespace BlazorMazeGenerator.MazeGen{
 
                 if (InitialNode != TerminalNode)
                 {
-                    int[] tmp = EdgeList[i];
+                    int[] tmp = _WallEdges[i];
 
-                    MST.Add(tmp);
+                    _MST.Add(tmp);
+
+                    _WallEdges[i][4] = 0;
+                    
 
                     Forest.Union(InitialNode, TerminalNode);
                 }
             }
 
-            return MST;
+
+            //for (int i = 0; i < _WallEdges.Count;)
+            //{
+            //    if (_WallEdges[i][0] == -1)
+            //    {
+            //        _WallEdges.RemoveAt(i);
+            //    }
+            //    else
+            //    {
+            //        i++;
+            //    }
+            //}
+
+            return _MST;
         }
+
+        public int[,] grid
+        {
+            get { return this._grid; }
+            set { this._grid = value; }
+        }
+
+        public int[,] edges
+        {
+            get { return this._edges; }
+            set { this._edges = value; }
+        }
+
+        public List<int[]> EdgeList
+        {
+            get { return this._EdgeList; }
+            set { this._EdgeList = value; }
+        }
+
+        public List<int[]> WallEdges
+        {
+            get { return this._WallEdges; }
+            set { this._WallEdges = value; }
+        }
+
+        public List<int[]> MST
+        {
+            get { return this._MST; }
+            set { this._MST = value; }
+        }
+
 
         public void NodesToString()
         {
@@ -126,7 +178,7 @@ namespace BlazorMazeGenerator.MazeGen{
             {
                 for (int j = 0; j < GridWidth; j++)
                 {
-                    Console.Write(this.grid[i,j] + ", ");
+                    Console.Write(this._grid[i,j] + ", ");
                 }
             }
             Console.Write("]");
@@ -136,9 +188,9 @@ namespace BlazorMazeGenerator.MazeGen{
         {
 
             Console.Write("\nEdges: [");
-            for (int i = 0; i < this.EdgeList.Count; i++)
+            for (int i = 0; i < this._EdgeList.Count; i++)
             {
-                Console.Write("[" + EdgeList[i][0] + ", " + EdgeList[i][1] + ", " + EdgeList[i][2] + ", " + EdgeList[i][3] + "]");
+                Console.Write("[" + _EdgeList[i][0] + ", " + EdgeList[i][1] + ", " + EdgeList[i][2] + ", " + EdgeList[i][3] + "]");
             }
             Console.Write("]");
         }

@@ -49,3 +49,36 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+.maze-container {
+    display: inline-block;
+}
+
+.maze-row {
+    display: flex;
+}
+
+.node {
+    width: 20px;
+    height: 20px;
+    background-color: white;
+}
+
+.vertical-wall {
+    width: 4px;
+    height: 20px;
+    background-color: black;
+}
+
+.horizontal-wall {
+    width: 20px;
+    height: 4px;
+    background-color: black;
+}
+
+.space {
+    width: 20px;
+    height: 4px;
+    background-color: white;
+}
+
