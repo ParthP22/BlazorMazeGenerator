@@ -11,6 +11,7 @@
     <button @onclick="GenerateMaze">Generate Maze</button>
 </p>
 
+@*
 @if (mst != null)
 {
     <h4>Minimum Spanning Tree (MST):</h4>
@@ -21,10 +22,12 @@
         }
     </ul>
 }
-else @*if (mst == null)*@
+else //if (mst == null)
 {
     <p>No maze generated yet.</p>
 }
+*@
+
 @*
 else
 {
@@ -150,6 +153,66 @@ else
 {
     <svg width="@(GridWidth * UnitSize)" height="@(GridHeight * UnitSize)" style="border:1px solid black;">
         @for(int i = 0; i < walls.Count; i++)
+        { 
+            @if (walls[i][2] == 0) // Vertical edge
+            {
+                @*
+                if (walls[0][4] == 1)
+                {
+                    <line x1="@GetX(walls[0][0])" y1="@GetY(walls[0][0])" x2="@GetX(walls[0][0])" y2="@GetY(walls[0][0]) + @UnitSize" stroke="black" stroke-width="2" />
+                }
+                else
+                {
+                    <line x1="@GetX(walls[0][0])" y1="@GetY(walls[0][0])" x2="@GetX(walls[0][0])" y2="@GetY(walls[0][0]) + @UnitSize" stroke="white" stroke-width="2" />
+                }
+                *@
+                //var x1 = @GetX(walls[0][0]) + @UnitSize;
+                //var y1 = @GetY(walls[0][0]);
+                //var x2 = @GetX(walls[0][0]) + @UnitSize;
+                //var y2 = @GetY(walls[0][0]) + @UnitSize;
+
+                if (walls[i][4] == 1)
+                {
+                    var x1 = ((walls[i][0] % @GridWidth) + 1) * @UnitSize;
+                    var y1 = ((walls[i][0] / @GridHeight) + 1) * @UnitSize - @UnitSize;
+                    var x2 = ((walls[i][0] % @GridWidth) + 1) * @UnitSize;
+                    var y2 = ((walls[i][0] / @GridHeight) + 1) * @UnitSize;
+                    <line x1=@x1 y1=@y1 x2=@x2 y2=@y2 stroke="black" stroke-width="2" />
+                }
+
+            }
+            else if (walls[i][2] == 1) // Horizontal edge
+            {
+                @*
+                if (walls[0][4] == 1)
+                {
+                    <line x1="@GetX(walls[0][0])" y1="@GetY(walls[0][0])" x2="@GetX(walls[0][0]) + @UnitSize" y2="@GetY(walls[0][0])" stroke="black" stroke-width="2" />
+                }
+                else
+                {
+                    <line x1="@GetX(walls[0][0])" y1="@GetY(walls[0][0])" x2="@GetX(walls[0][0]) + @UnitSize" y2="@GetY(walls[0][0])" stroke="white" stroke-width="2" />
+                }
+                *@
+                //var x1 = @GetX(walls[0][0]);
+                //var y1 = @GetY(walls[0][0]) + @UnitSize;
+                //var x2 = @GetX(walls[0][0]) + @UnitSize;
+                //var y2 = @GetY(walls[0][0]) + @UnitSize;
+                
+                if (walls[i][4] == 1)
+                {
+                    var x1 = ((walls[i][0] % @GridWidth) + 1) * @UnitSize - @UnitSize;
+                    var y1 = ((walls[i][0] / @GridHeight) + 1) * @UnitSize;
+                    var x2 = ((walls[i][0] % @GridWidth) + 1) * @UnitSize;
+                    var y2 = ((walls[i][0] / @GridHeight) + 1) * @UnitSize;
+                    <line x1=@x1 y1=@y1 x2=@x2 y2=@y2 stroke="black" stroke-width="2" />
+                }
+                @*<line x1="25" y1="25" x2="50" y2="25" stroke="black" stroke-width="2" />*@
+
+            }
+        }
+
+        @*
+        @for(int i = 0; i < walls.Count; i++)
         {
             @if (walls[i][2] == 0) // Vertical edge
             {
@@ -174,7 +237,7 @@ else
                     <line x1="@GetX(walls[i][0])" y1="@GetY(walls[i][0])" x2="@GetX(walls[i][0]) + @UnitSize" y2="@GetY(walls[i][0])" stroke="white" stroke-width="2" />
                 }
                 
-            }
+            }*@
             
         }
     </svg>
@@ -184,36 +247,51 @@ else
     <p>No maze generated yet.</p>
 }
 
+<script>
+    const x1 = 10;
+    const y1 = 10;
+    const x2 = 50 + 100; // Perform arithmetic here
+    const y2 = 50 + 100; // Perform arithmetic here
+
+    document.getElementById("myLine").setAttribute("x1", x1);
+    document.getElementById("myLine").setAttribute("y1", y1);
+    document.getElementById("myLine").setAttribute("x2", x2);
+    document.getElementById("myLine").setAttribute("y2", y2);
+</script>
+
 @code {
     private List<int[]>? mst;
     private List<int[]>? walls;
     private int[,]? edges;
     private int[,]? grid;
-    private int WindowHeight = 75;
-    private int WindowWidth = 75;
+    private int WindowHeight = 1000;
+    private int WindowWidth = 1000;
     private int UnitSize = 25;
     private int GridHeight => WindowHeight / UnitSize;
     private int GridWidth => WindowWidth / UnitSize;
 
 
 
-    private int GetX(int node) => (node % GridWidth) * UnitSize + UnitSize;
-    private int GetY(int node) => (node / GridWidth) * UnitSize + UnitSize;
+    private int GetX(int node) => ((node % GridWidth) ) * UnitSize;
+    private int GetY(int node) => ((node % GridHeight) ) * UnitSize;
 
     private void GenerateMaze()
     {
         Console.WriteLine("Generating Maze...");
         var generator = new MazeGen.MazeGenerator(WindowHeight, WindowWidth, UnitSize);
         mst = generator.Kruskals();
-        foreach (int[] edge in mst)
-        {
-            Console.WriteLine(edge[0] + ", " + edge[1]);
-        }
+        // foreach (int[] edge in mst)
+        // {
+        //     Console.WriteLine(edge[0] + ", " + edge[1]);
+        // }
 
         walls = generator.WallEdges;
         grid = generator.grid;
 
         edges = generator.edges;
+
+        Console.WriteLine("First wall: " + walls[0][0] + ", " + walls[0][1]);
+        Console.WriteLine("x1: " + GetX(walls[0][0]) + ", y1: " + GetY(walls[0][0]) + ", x2: " + GetX(walls[0][0]) + ", y2: " + GetY(walls[0][0]) );
 
 
         // Force UI to refresh (optional)
@@ -222,8 +300,33 @@ else
 
 }
 
+@*
+@for(int i = 0; i < walls.Count; i++)
+{
+    @if (walls[i][2] == 0) // Vertical edge
+    {
+        if (walls[i][4] == 1)
+        {
+            <line x1="@GetX(walls[i][0])" y1="@GetY(walls[i][0])" x2="@GetX(walls[i][0])" y2="@GetY(walls[i][0]) + @UnitSize" stroke="black" stroke-width="2" />
+        }
+        else
+        {
+            <line x1="@GetX(walls[i][0])" y1="@GetY(walls[i][0])" x2="@GetX(walls[i][0])" y2="@GetY(walls[i][0]) + @UnitSize" stroke="white" stroke-width="2" />
+        }
 
-
-
-
+    }
+    else if (walls[i][2] == 1) // Horizontal edge
+    {
+        if (walls[i][4] == 1)
+        {
+            <line x1="@GetX(walls[i][0])" y1="@GetY(walls[i][0])" x2="@GetX(walls[i][0]) + @UnitSize" y2="@GetY(walls[i][0])" stroke="black" stroke-width="2" />
+        }
+        else
+        {
+            <line x1="@GetX(walls[i][0])" y1="@GetY(walls[i][0])" x2="@GetX(walls[i][0]) + @UnitSize" y2="@GetY(walls[i][0])" stroke="white" stroke-width="2" />
+        }
+                
+    }
+}
+*@
  
