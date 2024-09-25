@@ -10,6 +10,7 @@ namespace BlazorMazeGenerator.MazeGen{
         private List<int[]> _EdgeList;
         private List<int[]> _WallEdges;
         private List<int[]> _MST;
+        private Dictionary<int, List<int[]>> _AdjList;
         private int WindowHeight;
         private int WindowWidth;
         private int GridHeight;
@@ -30,12 +31,14 @@ namespace BlazorMazeGenerator.MazeGen{
             this._EdgeList = new List<int[]>();
             this._MST = new List<int[]>();
             this._WallEdges = new List<int[]>();
+            this._AdjList = new Dictionary<int, List<int[]>>();
 
             for (int i = 0, k = 0; i < GridHeight; i++)
             {
                 for (int j = 0; j < GridWidth; j++)
                 {
                     _grid[i,j] = k;
+                    _AdjList.Add(i, new List<int[]>());
                     k++;
                 }
             }
@@ -81,6 +84,15 @@ namespace BlazorMazeGenerator.MazeGen{
             {
                 this._EdgeList.Add(new int[] { _edges[i, 0], _edges[i, 1], _edges[i, 2], _edges[i, 3], _edges[i,4] });
                 this._WallEdges.Add(new int[] { _edges[i, 0], _edges[i, 1], _edges[i, 2], _edges[i, 3], _edges[i,4] });
+            }
+
+            for (int i = 0; i < _grid.GetLength(0); i++)
+            {
+                
+                this._AdjList[_grid[i,0]].Add(new int[] { _grid[i, 1], _grid[i,2], _grid[i,3], _grid[i,4] });
+                this._AdjList[_grid[i,1]].Add(new int[] { _grid[i, 0], _grid[i, 2], _grid[i, 3], _grid[i, 4] });
+
+                
             }
 
         }
@@ -138,6 +150,31 @@ namespace BlazorMazeGenerator.MazeGen{
             //}
 
             return _MST;
+        }
+
+        public List<int[]> Prims()
+        {
+            PriorityQueue<int,int> pq = new PriorityQueue<int,int>();
+
+            pq.Enqueue(0,0);
+
+            for (int i = 1; i < grid.GetLength(0); i++)
+            {
+                pq.Enqueue(i,int.MaxValue);
+            }
+
+            while (pq.Count >= 0)
+            {
+                int node = pq.Dequeue();
+                List<int[]> list = this._AdjList.GetValueOrDefault(node,new List<int[]>);
+                foreach(int[] num in list)
+                {
+
+                }
+            }
+
+
+            return MST;
         }
 
         public int[,] grid
